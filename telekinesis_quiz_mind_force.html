@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telekinesis Quiz – Mind Force</title>
+<style>
+:root{
+  --ink:#25234a;--pink:#ff6fae;--blue:#59c7f5;--yellow:#ffd65a;
+  --mint:#68e0bd;--purple:#9274ff;--white:#fff;--shadow:0 12px 30px #32266b22;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;font-family:ui-rounded,"Trebuchet MS",system-ui,sans-serif;color:var(--ink);
+ background:radial-gradient(circle at 10% 10%,#fff6c9 0 8%,transparent 28%),radial-gradient(circle at 90% 15%,#ffd9ed 0 8%,transparent 27%),linear-gradient(135deg,#dff8ff,#f4eaff 55%,#fff0d8);overflow-x:hidden}
+button{font:inherit;cursor:pointer;border:0}
+.app{max-width:1250px;margin:auto;padding:18px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:55px;height:55px;border-radius:18px;background:linear-gradient(135deg,var(--purple),var(--pink));display:grid;place-items:center;color:white;font-size:28px;box-shadow:var(--shadow)}
+h1{font-size:clamp(22px,4vw,34px);margin:0;line-height:1.05;letter-spacing:-1px}
+.subtitle{font-size:13px;color:#66618d;margin-top:4px}
+.pill{background:#ffffffc9;border:1px solid #fff;border-radius:30px;padding:9px 14px;font-weight:800;box-shadow:var(--shadow);font-size:13px}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px;align-items:start}
+.game-panel,.side-panel{background:#ffffffb8;border:2px solid #fff;border-radius:26px;padding:18px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+.topline{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}
+.progress-wrap{height:11px;background:#e8e4ff;border-radius:20px;overflow:hidden;flex:1}
+.progress{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--purple),var(--pink));border-radius:20px;transition:width .3s}
+.question-count{font-size:13px;font-weight:900;white-space:nowrap}
+.question-card{background:linear-gradient(135deg,#fff,#f4f0ff);border:2px solid white;border-radius:22px;padding:22px;min-height:160px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
+.question-card:after{content:"✦";position:absolute;right:20px;top:8px;font-size:54px;color:#e8dcff;transform:rotate(15deg)}
+.tag{display:inline-flex;align-self:flex-start;padding:6px 11px;border-radius:20px;background:#e3f9f3;color:#187b68;font-size:11px;font-weight:900;letter-spacing:.5px;margin-bottom:10px}
+#question{font-size:clamp(19px,2.7vw,27px);font-weight:900;line-height:1.3;max-width:850px;position:relative;z-index:1}
+#hint{font-size:13px;color:#77739a;margin-top:9px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.answer{min-height:84px;text-align:left;padding:15px 16px;border-radius:19px;background:white;border:2px solid #eee9ff;box-shadow:0 7px 0 #e5dfff;display:flex;align-items:center;gap:12px;transition:transform .15s,border .15s,background .15s;position:relative}
+.answer:hover,.answer.hovered{transform:translateY(-4px);border-color:var(--purple);background:#f8f5ff}
+.answer:active{transform:translateY(1px);box-shadow:0 3px 0 #e5dfff}
+.letter{width:37px;height:37px;flex:none;border-radius:13px;display:grid;place-items:center;font-weight:1000;color:#fff;background:var(--purple)}
+.answer:nth-child(2) .letter{background:#f5a33d}.answer:nth-child(3) .letter{background:#24b99c}.answer:nth-child(4) .letter{background:#ed6d9e}
+.answer-text{font-size:14px;font-weight:800;line-height:1.35}
+.answer.correct{border-color:#28c99c;background:#eafff7;box-shadow:0 7px 0 #b8f0dd}
+.answer.wrong{border-color:#ff6b83;background:#fff0f2;box-shadow:0 7px 0 #ffd0d8}
+.feedback{min-height:38px;padding:10px 3px 0;font-weight:900;font-size:14px}
+.feedback.good{color:#159875}.feedback.bad{color:#d94b69}
+.side-panel{display:flex;flex-direction:column;gap:13px}
+.cam-head{display:flex;justify-content:space-between;align-items:center;font-weight:900}
+.cam-wrap{position:relative;border-radius:19px;overflow:hidden;background:#25234a;aspect-ratio:4/3;border:3px solid white}
+video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block}
+#handCanvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transform:scaleX(-1)}
+.cam-status{font-size:12px;color:#77739a;line-height:1.4}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.action{padding:10px 13px;border-radius:14px;font-weight:900;background:#eeeaff;color:#5141a0}
+.action.primary{background:linear-gradient(135deg,#8e75ff,#c16cff);color:white;box-shadow:0 5px 0 #7055d5}
+.action:disabled{opacity:.45;cursor:not-allowed}
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.stat{background:#f5f2ff;border-radius:15px;padding:10px;text-align:center}
+.stat strong{display:block;font-size:20px}.stat span{font-size:11px;font-weight:800;color:#77739a}
+.instructions{background:#fff7d9;border:1px solid #ffeb9e;border-radius:17px;padding:13px;font-size:12px;line-height:1.5}
+.instructions b{color:#8a6510}
+.overlay{position:fixed;inset:0;background:#28204f99;display:grid;place-items:center;padding:18px;z-index:10}
+.modal{width:min(560px,100%);background:white;border-radius:28px;padding:28px;text-align:center;box-shadow:0 25px 70px #15102e55}
+.modal .emoji{font-size:54px}.modal h2{font-size:30px;margin:8px 0}.modal p{color:#6e698f;line-height:1.55}
+.modal .action{margin-top:12px;padding:13px 22px}
+.hidden{display:none!important}
+.footer{text-align:center;color:#77739a;font-size:11px;padding:14px}
+#cursor{position:absolute;width:27px;height:27px;border:3px solid #fff;border-radius:50%;background:#ffdf59aa;box-shadow:0 0 0 5px #9274ff66,0 0 24px #ffe36b;transform:translate(-50%,-50%);pointer-events:none;z-index:4;display:none}
+#cursor.pinching{background:#ff6fae;box-shadow:0 0 0 7px #ff6fae55,0 0 25px #ff6fae}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.side-panel{order:-1}.cam-wrap{max-width:420px;margin:auto}.answers{gap:9px}}
+@media(max-width:520px){.app{padding:10px}.game-panel,.side-panel{padding:13px;border-radius:20px}.answers{grid-template-columns:1fr}.answer{min-height:66px}.question-card{padding:17px;min-height:140px}.stats{width:100%}.pill{flex:1;text-align:center}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><div class="logo">🧠</div><div><h1>Telekinesis Quiz</h1><div class="subtitle">MIND FORCE • Bahasa Indonesia Kelas IX</div></div></div>
+  <div class="stats"><div class="pill">⭐ Skor: <span id="scoreTop">0</span></div><div class="pill">❤️ Nyawa: <span id="livesTop">3</span></div><div class="pill">⏱️ <span id="timeTop">25</span> detik</div></div>
+</header>
+
+<div class="layout">
+ <main class="game-panel">
+  <div class="topline"><div class="progress-wrap"><div class="progress" id="progress"></div></div><div class="question-count" id="qCount">SOAL 1 / 25</div></div>
+  <section class="question-card"><span class="tag">📚 MISI TEKS PROSEDUR</span><div id="question">Siap menguji kekuatan pikiranmu?</div><div id="hint">Arahkan jari telunjuk ke jawaban, lalu cubit ibu jari dan telunjuk untuk memilih.</div></section>
+  <div class="answers" id="answers"></div>
+  <div class="feedback" id="feedback" aria-live="polite">Aktifkan kamera, lalu tekan Mulai Misi!</div>
+ </main>
+
+ <aside class="side-panel">
+  <div class="cam-head"><span>📸 KAMERA PEMAIN</span><span class="pill" id="camBadge">OFFLINE</span></div>
+  <div class="cam-wrap"><video id="webcam" autoplay playsinline muted></video><canvas id="handCanvas"></canvas><div id="cursor"></div></div>
+  <div class="cam-status" id="camStatus">Kamera belum diaktifkan. Izinkan akses webcam untuk memainkan game dengan gerakan tangan.</div>
+  <div class="controls"><button class="action primary" id="cameraBtn">Aktifkan Kamera</button><button class="action" id="startBtn" disabled>Mulai Misi 🚀</button></div>
+  <div class="mini-stats"><div class="stat"><strong id="scoreSide">0</strong><span>SKOR</span></div><div class="stat"><strong id="livesSide">❤️❤️❤️</strong><span>NYAWA</span></div><div class="stat"><strong id="combo">0</strong><span>STREAK</span></div></div>
+  <div class="instructions"><b>🪄 Cara menggunakan Mind Force</b><br>1. Tunjukkan satu tangan ke kamera.<br>2. Gerakkan ujung jari telunjuk untuk mengarahkan bola energi.<br>3. Arahkan bola ke kartu jawaban.<br>4. Cubit ibu jari + telunjuk untuk memilih!<br><br><b>Tips:</b> Pastikan tangan terlihat jelas dan pencahayaan cukup. Bisa juga klik jawaban dengan mouse.</div>
+  <button class="action" id="soundBtn">🔊 Suara: ON</button>
+ </aside>
+</div>
+<div class="footer">✨ Belajar teks prosedur dengan kekuatan pikiran • Telekinesis Quiz – Mind Force</div>
+</div>
+
+<div class="overlay" id="welcome">
+ <div class="modal"><div class="emoji">🧠✨</div><h2>Telekinesis Quiz!</h2><p>Selamat datang, Mind Master! Jawab 25 tantangan tentang <b>Teks Prosedur</b>. Gunakan gerakan tangan untuk mengarahkan energi dan memilih jawaban yang tepat.</p><p><b>25 soal • 25 detik per soal • 3 nyawa</b></p><button class="action primary" id="welcomeBtn">Aku Siap! 🌟</button></div>
+</div>
+<div class="overlay hidden" id="result">
+ <div class="modal"><div class="emoji" id="resultEmoji">🏆</div><h2 id="resultTitle">Misi Selesai!</h2><p id="resultText"></p><button class="action primary" id="restartBtn">Main Lagi 🔁</button></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script>
+const QUESTIONS = [
+ {q:"Apa tujuan utama teks prosedur?",o:["Menghibur pembaca dengan cerita","Menjelaskan langkah melakukan sesuatu","Menggambarkan suatu tempat","Menyampaikan pendapat penulis"],a:1,e:"Teks prosedur memberi petunjuk agar pembaca dapat melakukan atau membuat sesuatu."},
+ {q:"Bagian teks prosedur yang berisi hasil akhir yang ingin dicapai disebut ...",o:["Tujuan","材料","Penutup cerita","Orientasi"],a:0,e:"Tujuan menjelaskan hasil atau kegiatan yang akan dilakukan."},
+ {q:"Bagian yang memuat daftar benda yang diperlukan adalah ...",o:["Langkah-langkah","Alat dan bahan","Interpretasi","Koda"],a:1,e:"Alat dan bahan memuat perlengkapan atau bahan yang dibutuhkan."},
+ {q:"Urutan struktur teks prosedur yang tepat adalah ...",o:["Langkah–tujuan–alat","Tujuan–alat/bahan–langkah","Bahan–konflik–resolusi","Orientasi–komplikasi–koda"],a:1,e:"Struktur umum: tujuan, alat/bahan (jika diperlukan), lalu langkah-langkah."},
+ {q:"Kalimat yang tepat digunakan dalam langkah prosedur adalah ...",o:["Wah, indah sekali!","Masukkan tepung ke dalam wadah.","Aku sangat menyukainya.","Kemarin kami pergi."],a:1,e:"Kalimat perintah atau instruksi lazim digunakan dalam langkah prosedur."},
+ {q:"Kata kerja yang menyatakan perintah adalah ...",o:["Membaca","Dibacakan","Bacalah","Pembaca"],a:2,e:"'Bacalah' merupakan kata kerja imperatif atau perintah."},
+ {q:"Konjungsi temporal dalam teks prosedur ditunjukkan oleh kata ...",o:["Karena","Tetapi","Kemudian","Walaupun"],a:2,e:"'Kemudian' menunjukkan urutan waktu atau tahapan."},
+ {q:"Kata 'pertama, selanjutnya, terakhir' berfungsi untuk ...",o:["Menunjukkan urutan langkah","Membandingkan benda","Menjelaskan sebab","Menggambarkan suasana"],a:0,e:"Penanda urutan membantu pembaca mengikuti tahapan secara runtut."},
+ {q:"Ciri utama teks prosedur adalah ...",o:["Langkah disusun secara runtut","Tokoh mengalami konflik","Berisi dialog antartokoh","Menggunakan alur maju-mundur"],a:0,e:"Langkah harus logis dan berurutan agar tujuan tercapai."},
+ {q:"Judul yang paling sesuai untuk teks prosedur adalah ...",o:["Persahabatan di Sekolah","Cara Membuat Jus Mangga","Keindahan Pantai","Liburan yang Menyenangkan"],a:1,e:"Judul tersebut menyatakan kegiatan yang dapat diikuti tahapannya."},
+ {q:"Kalimat larangan yang tepat dalam prosedur adalah ...",o:["Aduk hingga rata.","Jangan menyentuh kabel dengan tangan basah.","Tuangkan air secukupnya.","Siapkan dua lembar kertas."],a:1,e:"Kata 'jangan' menandai larangan atau hal yang tidak boleh dilakukan."},
+ {q:"Mengapa langkah-langkah harus disusun secara urut?",o:["Agar teks lebih panjang","Agar pembaca tidak salah melakukan tahapan","Agar terlihat seperti cerita","Agar tidak membutuhkan judul"],a:1,e:"Urutan yang benar mencegah kesalahan dan membantu keberhasilan kegiatan."},
+ {q:"Kata teknis dalam prosedur membuat sesuatu disebut ...",o:["Kata yang bermakna khusus pada bidang tertentu","Kata sapaan","Kata ulang","Kata tidak baku"],a:0,e:"Kata teknis berkaitan dengan bidang atau kegiatan yang dibahas."},
+ {q:"Perhatikan kalimat: 'Potonglah wortel tipis-tipis.' Kata 'potonglah' merupakan ...",o:["Kata sifat","Kata benda","Kata kerja imperatif","Kata keterangan tempat"],a:2,e:"Akhiran -lah pada kata kerja dapat mempertegas perintah."},
+ {q:"Informasi yang perlu dicantumkan pada prosedur keselamatan adalah ...",o:["Nama tokoh favorit","Peringatan bahaya dan tindakan pencegahan","Cerita masa kecil","Pendapat pembaca"],a:1,e:"Peringatan membantu pembaca menghindari risiko saat melakukan kegiatan."},
+ {q:"Teks prosedur kompleks biasanya memiliki ...",o:["Satu kata saja","Langkah-langkah lebih rinci dan saling berkaitan","Tidak memiliki tujuan","Hanya berisi gambar"],a:1,e:"Prosedur kompleks memuat tahapan yang lebih banyak dan terperinci."},
+ {q:"Perbaikan kalimat 'Lalu air dimasukkan' agar menjadi instruksi langsung adalah ...",o:["Air itu sangat jernih.","Masukkan air ke dalam wadah.","Air telah dimasukkan.","Mengapa air dimasukkan?"],a:1,e:"Kalimat 'Masukkan air ke dalam wadah' jelas dan berbentuk perintah."},
+ {q:"Apa fungsi nomor urut pada langkah-langkah prosedur?",o:["Sebagai hiasan","Menandai urutan pengerjaan","Menunjukkan jumlah paragraf","Menggantikan judul"],a:1,e:"Nomor membantu pembaca mengetahui tahapan yang harus dilakukan lebih dahulu."},
+ {q:"Kalimat yang menggunakan keterangan cara adalah ...",o:["Aduk adonan secara perlahan.","Letakkan panci di meja.","Besok kami memasak.","Panci itu berwarna merah."],a:0,e:"'Secara perlahan' menjelaskan bagaimana tindakan mengaduk dilakukan."},
+ {q:"Jika sebuah langkah terlewat, kemungkinan yang terjadi adalah ...",o:["Hasil selalu lebih baik","Proses dapat gagal atau hasil tidak sesuai","Teks berubah menjadi puisi","Tidak ada pengaruh apa pun"],a:1,e:"Setiap langkah dapat saling bergantung sehingga tidak boleh sembarangan dilewati."},
+ {q:"Salah satu sumber informasi untuk menulis prosedur yang akurat adalah ...",o:["Dugaan tanpa mencoba","Pengalaman, pengamatan, dan sumber tepercaya","Rumor yang belum jelas","Komentar acak"],a:1,e:"Prosedur perlu disusun berdasarkan informasi yang benar dan dapat diuji."},
+ {q:"Dalam teks prosedur, gambar atau diagram berguna untuk ...",o:["Menggantikan semua langkah","Memperjelas tahapan yang sulit dibayangkan","Membuat teks menjadi fiksi","Menghilangkan tujuan"],a:1,e:"Visual membantu pembaca memahami posisi, bentuk, atau cara melakukan sesuatu."},
+ {q:"Kalimat efektif untuk petunjuk adalah ...",o:["Silakan mungkin barangkali tuangkan airnya ya.","Tuangkan 200 ml air ke dalam gelas.","Air yang mana itu dituangkan?","Gelasnya, airnya, ya begitulah."],a:1,e:"Kalimat efektif jelas, hemat, dan menyebutkan tindakan serta ukuran."},
+ {q:"Sebelum memublikasikan teks prosedur, penulis sebaiknya ...",o:["Menghapus semua tanda baca","Menguji langkah dan menyunting kejelasan bahasa","Mengacak urutan langkah","Menghilangkan informasi penting"],a:1,e:"Uji coba dan penyuntingan memastikan prosedur mudah dipahami dan benar."},
+ {q:"Manakah penutup yang sesuai untuk teks prosedur?",o:["Dengan mengikuti langkah tersebut, minuman siap disajikan.","Pada suatu hari hiduplah seekor naga.","Aku tidak tahu harus bagaimana.","Tokoh itu pun pergi."],a:0,e:"Penutup dapat menyatakan hasil akhir atau tips setelah langkah dilakukan."}
+];
+
+const $ = id => document.getElementById(id);
+let score=0,lives=3,streak=0,index=0,timeLeft=25,timer=null,playing=false,locked=false,soundOn=true;
+let stream=null,hands=null,handLoop=false,lastPinch=false,lastSelect=0,hovered=-1;
+const video=$('webcam'), canvas=$('handCanvas'), ctx=canvas.getContext('2d'), cursor=$('cursor');
+const letters=['A','B','C','D'];
+function tone(freq=600,duration=.12,type='sine'){
+ if(!soundOn)return;
+ try{const ac=tone.ac||(tone.ac=new (window.AudioContext||window.webkitAudioContext)());const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=freq;g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+duration);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+duration)}catch(e){}
+}
+function updateStats(){
+ $('scoreTop').textContent=score;$('scoreSide').textContent=score;
+ $('livesTop').textContent=lives;$('livesSide').textContent='❤️'.repeat(lives)+'🖤'.repeat(3-lives);
+ $('combo').textContent=streak;$('timeTop').textContent=timeLeft;
+}
+function shuffle(arr){return arr.map(v=>[Math.random(),v]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+let order=[];
+function startGame(){
+ score=0;lives=3;streak=0;index=0;playing=true;locked=false;order=shuffle(QUESTIONS.map((_,i)=>i));
+ $('welcome').classList.add('hidden');$('result').classList.add('hidden');updateStats();showQuestion();startTimer();
+}
+function showQuestion(){
+ if(index>=QUESTIONS.length){endGame(true);return}
+ const q=QUESTIONS[order[index]];
+ $('qCount').textContent=`SOAL ${index+1} / ${QUESTIONS.length}`;
+ $('progress').style.width=(index/QUESTIONS.length*100)+'%';
+ $('question').textContent=q.q;$('hint').textContent='Arahkan bola energi ke kartu jawaban, lalu cubit untuk memilih.';
+ const answerData=q.o.map((text,i)=>({text,correct:i===q.a}));
+ const shuffled=shuffle(answerData);
+ $('answers').innerHTML='';
+ shuffled.forEach((item,i)=>{
+  const btn=document.createElement('button');btn.className='answer';btn.dataset.correct=item.correct;
+  btn.innerHTML=`<span class="letter">${letters[i]}</span><span class="answer-text"></span>`;
+  btn.querySelector('.answer-text').textContent=item.text;
+  btn.addEventListener('click',()=>chooseAnswer(i));
+  $('answers').appendChild(btn);
+ });
+ $('feedback').textContent='🪄 Pilih jawaban yang menurutmu paling tepat!';$('feedback').className='feedback';
+ hovered=-1;
+}
+function startTimer(){
+ clearInterval(timer);timeLeft=25;updateStats();
+ timer=setInterval(()=>{if(!playing||locked)return;timeLeft--;updateStats();if(timeLeft<=0){clearInterval(timer);wrongAnswer('⏰ Waktu habis!');}},1000);
+}
+function chooseAnswer(i){
+ if(!playing||locked)return;
+ const btn=$('answers').children[i];if(!btn)return;
+ locked=true;clearInterval(timer);
+ const correct=btn.dataset.correct==='true';
+ [...$('answers').children].forEach((b,j)=>{b.disabled=true;if(b.dataset.correct==='true')b.classList.add('correct');else if(j===i)b.classList.add('wrong')});
+ if(correct){
+  score+=100+timeLeft*2;streak++;$('feedback').textContent='✨ BENAR! '+QUESTIONS[order[index]].e;$('feedback').className='feedback good';tone(780,.12);setTimeout(()=>tone(1040,.18),110);
+ }else{
+  lives--;streak=0;$('feedback').textContent='💫 Belum tepat. '+QUESTIONS[order[index]].e;$('feedback').className='feedback bad';tone(180,.3,'triangle');
+ }
+ updateStats();
+ setTimeout(()=>{if(lives<=0){endGame(false);return}index++;locked=false;showQuestion();startTimer()},2200);
+}
+function wrongAnswer(message){
+ if(!playing||locked)return;locked=true;lives--;streak=0;$('feedback').textContent=message+' '+QUESTIONS[order[index]].e;$('feedback').className='feedback bad';tone(180,.3,'triangle');updateStats();
+ [...$('answers').children].forEach(b=>{b.disabled=true;if(b.dataset.correct==='true')b.classList.add('correct')});
+ setTimeout(()=>{if(lives<=0){endGame(false);return}index++;locked=false;showQuestion();startTimer()},2200);
+}
+function endGame(won){
+ playing=false;locked=true;clearInterval(timer);$('progress').style.width=(index/QUESTIONS.length*100)+'%';
+ $('resultEmoji').textContent=won?'🏆':'💪';$('resultTitle').textContent=won?'Misi Berhasil!':'Coba Lagi, Mind Master!';
+ $('resultText').textContent=`Kamu menyelesaikan ${Math.min(index+(won?0:1),25)} dari 25 soal. Skor akhir: ${score}. ${score>=2000?'Luar biasa! Kekuatan literasimu hebat!':'Terus berlatih, kamu pasti semakin jago memahami teks prosedur!'}`;
+ $('result').classList.remove('hidden');tone(won?880:250,.35);
+}
+$('welcomeBtn').onclick=()=>{$('welcome').classList.add('hidden');if(stream)startGame();else $('feedback').textContent='Aktifkan kamera terlebih dahulu, lalu tekan Mulai Misi.'};
+$('startBtn').onclick=()=>{if(!stream)return;startGame()};
+$('restartBtn').onclick=()=>startGame();
+$('soundBtn').onclick=()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'🔊 Suara: ON':'🔇 Suara: OFF';if(soundOn)tone(700)};
+$('cameraBtn').onclick=async()=>{
+ try{
+  $('camStatus').textContent='Meminta izin kamera...';
+  stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:640,height:480},audio:false});
+  video.srcObject=stream;await video.play();
+  $('camBadge').textContent='AKTIF';$('camBadge').style.color='#159875';
+  $('camStatus').textContent='Kamera aktif! Tampilkan tangan di depan kamera untuk mengendalikan bola energi.';
+  $('cameraBtn').textContent='Kamera Aktif ✓';$('cameraBtn').disabled=true;$('startBtn').disabled=false;
+  initHands();
+ }catch(err){$('camStatus').textContent='Kamera tidak dapat diakses. Izinkan akses kamera dan buka file melalui localhost atau HTTPS. ('+err.message+')';}
+};
+async function initHands(){
+ if(!window.Hands){$('camStatus').textContent='MediaPipe belum termuat. Periksa koneksi internet lalu muat ulang halaman.';return}
+ hands=new Hands({locateFile:(file)=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+ hands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:.65,minTrackingConfidence:.6});
+ hands.onResults(onHandResults);
+ handLoop=true;
+ async function frame(){if(!handLoop)return;if(video.readyState>=2){try{await hands.send({image:video})}catch(e){}}requestAnimationFrame(frame)}
+ frame();
+}
+function onHandResults(results){
+ const w=canvas.clientWidth,h=canvas.clientHeight;
+ if(canvas.width!==Math.round(w*devicePixelRatio)||canvas.height!==Math.round(h*devicePixelRatio)){canvas.width=Math.round(w*devicePixelRatio);canvas.height=Math.round(h*devicePixelRatio)}
+ ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);ctx.clearRect(0,0,w,h);
+ const lm=results.multiHandLandmarks&&results.multiHandLandmarks[0];
+ if(!lm){cursor.style.display='none';document.querySelectorAll('.answer').forEach(b=>b.classList.remove('hovered'));lastPinch=false;return}
+ // Canvas is mirrored with CSS, so coordinates here are converted for the mirrored preview.
+ const x=(1-lm[8].x)*w,y=lm[8].y*h;
+ cursor.style.display='block';cursor.style.left=x+'px';cursor.style.top=y+'px';
+ const d=Math.hypot(lm[4].x-lm[8].x,lm[4].y-lm[8].y);
+ const pinching=d<.055;cursor.classList.toggle('pinching',pinching);
+ const rect=canvas.getBoundingClientRect(),px=rect.left+x,py=rect.top+y;
+ const elements=[...document.querySelectorAll('.answer')];let current=-1;
+ elements.forEach((el,i)=>{const r=el.getBoundingClientRect();if(px>=r.left&&px<=r.right&&py>=r.top&&py<=r.bottom)current=i;el.classList.toggle('hovered',i===current)});
+ if(pinching&&!lastPinch&&Date.now()-lastSelect>650&&current>=0){lastSelect=Date.now();chooseAnswer(current)}
+ lastPinch=pinching;
+ // Draw a subtle energy ray and fingertip marker.
+ ctx.beginPath();ctx.arc(x,y,13,0,Math.PI*2);ctx.fillStyle=pinching?'#ff6fae99':'#ffe36b99';ctx.fill();ctx.lineWidth=2;ctx.strokeStyle='#ffffff';ctx.stroke();
+}
+window.addEventListener('beforeunload',()=>{handLoop=false;if(stream)stream.getTracks().forEach(t=>t.stop())});
+</script>
+</body>
+</html>
